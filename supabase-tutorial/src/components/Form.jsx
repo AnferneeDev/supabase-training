@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import supabase from './supabase-client.js'
+import supabase from '../supabase-client.js'
 
 export default function SalesForm({ reps }) {
     const [status, setStatus] = useState('')
