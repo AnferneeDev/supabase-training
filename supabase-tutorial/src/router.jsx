@@ -3,6 +3,7 @@ import Singin from "./components/Singin.jsx";
 import Singup from "./components/Singup.jsx";
 import Dashboard from "./routes/Dashboard.jsx";
 import Header from "./components/Header.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const router = createBrowserRouter([
   {
@@ -16,10 +17,10 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      <>
+      <ProtectedRoute>
         <Header />
         <Dashboard />
-      </>
+      </ProtectedRoute>
     ),
   },
 ]);

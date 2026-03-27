@@ -1,18 +1,28 @@
 import { useState } from 'react'
 import supabase from '../supabase-client.js'
+import { useAuth } from '../context/AuthContex.jsx'
 
-export default function SalesForm({ reps }) {
+export default function SalesForm({ profiles }) {
     const [status, setStatus] = useState('')
+    const { session } = useAuth()
 
     const addDeal = async (formData) => {
-        const name = formData.get('rep_name')
+        const rep_id = formData.get('rep_id')
         const amount = formData.get('deal_amount')
+
+        // Choice A: Find the name to keep both columns in sync
+        const selectedProfile = profiles.find(p => p.id === rep_id);
+        const name = selectedProfile ? selectedProfile.name : session.user.user_metadata.name;
 
         setStatus('Submitting...')
 
         const { error } = await supabase
             .from('sales_deals')
-            .insert([{ name, value: parseFloat(amount) }])
+            .insert([{ 
+                user_id: rep_id, 
+                name: name, 
+                value: parseFloat(amount) 
+            }])
 
         if (error) {
             console.error('Error adding deal:', error)
@@ -29,12 +39,16 @@ export default function SalesForm({ reps }) {
                 <div>
                     <label className="block text-sm font-medium text-slate-400 mb-2">Sales Representative</label>
                     <select 
-                        name="rep_name"
+                        name="rep_id"
                         className="w-full bg-slate-900 text-white rounded-lg px-4 py-3 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                     >
-                        {reps.map(rep => (
-                            <option key={rep.name} value={rep.name}>{rep.name}</option>
-                        ))}
+                        {session.user.user_metadata?.role === 'admin' ? (
+                            profiles.map(profile => (
+                                <option key={profile.id} value={profile.id}>{profile.name}</option>
+                            ))
+                        ) : (
+                            <option value={session.user.id}>{session.user.user_metadata?.name || 'My Sales'}</option>
+                        )}
                     </select>
                 </div>
 

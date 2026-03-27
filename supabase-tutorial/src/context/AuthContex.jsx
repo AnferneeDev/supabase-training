@@ -40,8 +40,8 @@ export const AuthContextProvider = ({ children }) => {
     const handleSignIn = async (email, password) => {
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
-                email: email.toLowerCase(),
-                password: password,
+                email: email.trim().toLowerCase(),
+                password: password.trim(),
             })
 
             if (error) {
@@ -60,11 +60,17 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
-    const handleSignUp = async (email, password) => {
+    const handleSignUp = async (email, password, name, role) => {
         try {
             const { data, error } = await supabase.auth.signUp({
-                email: email.toLowerCase(),
-                password: password,
+                email: email.trim().toLowerCase(),
+                password: password.trim(),
+                options: {
+                    data: {
+                        name: name.trim(),
+                        role: role,
+                    }
+                }
             })
 
             if (error) {

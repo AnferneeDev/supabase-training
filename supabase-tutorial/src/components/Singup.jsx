@@ -17,8 +17,10 @@ const Singup = () => {
         async (prevState, formData) => {
             const email = formData.get('email')
             const password = formData.get('password')
+            const name = formData.get('name')
+            const role = formData.get('role')
 
-            const result = await handleSignUp(email, password);
+            const result = await handleSignUp(email, password, name, role);
 
             if (result.error) {
                 return result.error;
@@ -42,6 +44,17 @@ const Singup = () => {
             
             <form action={submitAction} className="space-y-6">
                 <div>
+                    <label className="block text-sm font-medium text-slate-400 mb-2 ml-1">Name</label>
+                    <input 
+                        name="name"
+                        type="text" 
+                        required 
+                        placeholder="Name" 
+                        className="w-full bg-slate-900 text-white rounded-xl px-4 py-3 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium placeholder:text-slate-600"
+                    />
+                </div>
+                
+                <div>
                     <label className="block text-sm font-medium text-slate-400 mb-2 ml-1">Email</label>
                     <input 
                         name="email"
@@ -61,6 +74,14 @@ const Singup = () => {
                         placeholder="Password" 
                         className="w-full bg-slate-900 text-white rounded-xl px-4 py-3 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium placeholder:text-slate-600"
                     />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2 ml-1">Select your role</label>
+                  <select name="role" className="w-full bg-slate-900 text-white rounded-xl px-4 py-3 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium placeholder:text-slate-600">
+                    <option value="admin">Admin</option>
+                    <option value="sales_rep">Sales Rep</option>
+                  </select>
                 </div>
 
                 <button 

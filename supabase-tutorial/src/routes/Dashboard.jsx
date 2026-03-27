@@ -9,12 +9,7 @@ export default function Dashboard() {
   const { session, handleSignOut } = useAuth();
   const navigate = useNavigate();
   const [sales, setSales] = useState([])
-
-  useEffect(() => {
-    if (!session) {
-      navigate('/');
-    }
-  }, [session])
+  const [profiles, setProfiles] = useState([])
 
   async function fetchSales() {
     try {
@@ -31,8 +26,22 @@ export default function Dashboard() {
     }
   }
 
+  async function fetchProfiles() {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, name')
+      
+      if (error) throw error
+      setProfiles(data)
+    } catch (error) {
+      console.error('Error fetching profiles:', error)
+    }
+  }
+
   useEffect(() => {
     fetchSales()
+    fetchProfiles()
 
     const channel = supabase.channel('sales-changes').on(
       'postgres_changes',
@@ -52,11 +61,23 @@ export default function Dashboard() {
     }
   }, [])
 
+
+  // GUARD: If we are still loading (undefined) or if they are logged out (null)
+  // we shouldn't try to render the email yet!
+  if (!session) {
+    return (
+      <div className="flex items-center justify-center min-vh-100">
+        <p className="text-xl animate-pulse">Loading session...</p>
+      </div>
+    )
+  }
+
   return (
     <div className='border-2 border-black h-150 flex justify-center'>
       <div className='flex flex-row w p-4 gap-10'>
         <div className='h-96 w-full p-4'>
           <button className='bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all text-lg' onClick={handleSignOut}>Sign Out</button>
+          <p> email: {session.user.email}</p>
           <h2>Total Sales This Quarter</h2>
           {sales.length > 0 ? (
             <Chart
@@ -90,7 +111,7 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <SalesForm reps={sales} />
+        <SalesForm profiles={profiles} />
       </div>
     </div>
   )
