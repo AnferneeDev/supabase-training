@@ -2,9 +2,19 @@ import { useEffect, useState } from 'react'
 import supabase from '../supabase-client.js'
 import { Chart } from 'react-charts'
 import SalesForm from '../components/Form.jsx'
+import { useAuth } from '../context/AuthContex.jsx'
+import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
+  const { session, handleSignOut } = useAuth();
+  const navigate = useNavigate();
   const [sales, setSales] = useState([])
+
+  useEffect(() => {
+    if (!session) {
+      navigate('/');
+    }
+  }, [session])
 
   async function fetchSales() {
     try {
@@ -46,6 +56,7 @@ export default function Dashboard() {
     <div className='border-2 border-black h-150 flex justify-center'>
       <div className='flex flex-row w p-4 gap-10'>
         <div className='h-96 w-full p-4'>
+          <button className='bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all text-lg' onClick={handleSignOut}>Sign Out</button>
           <h2>Total Sales This Quarter</h2>
           {sales.length > 0 ? (
             <Chart

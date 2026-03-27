@@ -37,9 +37,67 @@ export const AuthContextProvider = ({ children }) => {
 
     }, [])
 
+    const handleSignIn = async (email, password) => {
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email.toLowerCase(),
+                password: password,
+            })
+
+            if (error) {
+                console.error('Error signing in:', error);
+                return { success: false, error: error.message }
+            }
+
+            if (data.session) {
+                console.log("Sign in successful");
+                return { success: true, data }
+            }
+
+        } catch (error) {
+            console.error('Unexpected sign in error:', error.message);
+            return { success: false, error: 'An unexpected error occurred.' }
+        }
+    }
+
+    const handleSignUp = async (email, password) => {
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email: email.toLowerCase(),
+                password: password,
+            })
+
+            if (error) {
+                console.error('Error signing up:', error);
+                return { success: false, error: error.message }
+            }
+
+            if (data.user) {
+                console.log("Sign up successful");
+                return { success: true, data }
+            }
+
+        } catch (error) {
+            console.error('Unexpected sign up error:', error.message);
+            return { success: false, error: 'An unexpected error occurred.' }
+        }
+    }
+
+    const handleSignOut = async () => {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+            console.error('Error signing out:', error);
+            return { success: false, error: error.message }
+        }
+
+        console.log("Sign out successful");
+        return { success: true }
+    }
+
 
     return (
-        <AuthContext.Provider value={{ session }}>
+        <AuthContext.Provider value={{ session, handleSignIn, handleSignUp, handleSignOut }}>
             {children}
         </AuthContext.Provider>
     )
